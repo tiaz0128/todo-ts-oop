@@ -38,15 +38,21 @@ export default class TodoListComponent
     const todoItemTemplate = document.createElement("template");
 
     todoItemTemplate.innerHTML = `<div class="todo-item" data-todo-id=${id}>
-          <input type="checkbox" check=${complete}>${task}<span class="del-btn">❌</span>
+          <input type="checkbox" ${
+            complete && "checked"
+          } class="toggle-btn">${task}<span class="del-btn">❌</span>
         </div>`;
 
     const todoItem = todoItemTemplate.content.firstElementChild! as HTMLElement;
     this.bindDeleteBtn(todoItem);
-    // this.bindEditBtn(todoItem);
+    this.bindToggleBtn(todoItem);
 
     return todoItem;
   };
+
+  setTodoList(newState: Todo[]) {
+    this.todoList = newState;
+  }
 
   private bindDeleteBtn(todoItem: HTMLElement) {
     const delBtn = getChildElement<HTMLElement>(todoItem, ".del-btn");
@@ -59,15 +65,17 @@ export default class TodoListComponent
     };
   }
 
-  // private bindEditBtn(todoItem: HTMLElement) {
-  //   const delBtn = getChildElement<HTMLElement>(todoItem, ".del-btn");
+  private bindToggleBtn(todoItem: HTMLElement) {
+    const toggleBtn = getChildElement<HTMLElement>(todoItem, ".toggle-btn");
 
-  //   delBtn.onclick = () => {
-  //     console.log(e.target, todoItem.dataset["todoId"]);
-  //   };
-  // }
+    toggleBtn.onclick = () => {
+      const todoId: string = todoItem.dataset["todoId"]!;
 
-  setTodoList(newState: Todo[]) {
-    this.todoList = newState;
+      const newState: Todo[] = this.todoList.map((todo) =>
+        todo.id === todoId ? { ...todo, complete: !todo.complete } : todo
+      );
+
+      this.setState(newState);
+    };
   }
 }

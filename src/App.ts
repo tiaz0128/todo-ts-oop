@@ -1,6 +1,7 @@
 import BaseComponent from "./common/BaseComponent.js";
 import InputComponent from "./components/Input.js";
 import TodoListComponent from "./components/TodoList.js";
+import { makeUniqueId } from "./util/helper.js";
 
 export default class App extends BaseComponent {
   private todoList: Todo[];
@@ -15,16 +16,14 @@ export default class App extends BaseComponent {
     this.todoList = [];
     this.attachTo(appRoot, "beforeend");
 
-    this.InputComponent = new InputComponent(
-      appRoot,
-      this.todoList,
-      this.setState
-    );
+    this.InputComponent = new InputComponent(appRoot, this.handleAddBtn);
+
     this.TodoListComponent = new TodoListComponent(
       appRoot,
       this.todoList,
       this.setState
     );
+
     this.render();
   }
 
@@ -35,10 +34,19 @@ export default class App extends BaseComponent {
 
   setState = (nextState: Todo[]) => {
     this.todoList = nextState;
-
-    this.InputComponent.setTodoList(nextState);
     this.TodoListComponent.setTodoList(nextState);
 
     this.render();
+  };
+
+  handleAddBtn = (newTask: string) => {
+    const newTodo: Todo = {
+      task: newTask,
+      complete: false,
+      id: makeUniqueId(),
+    };
+
+    const newState = [...this.todoList, newTodo];
+    this.setState(newState);
   };
 }
